@@ -1,0 +1,59 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://Sprite.gd" type="Script" id=1]
+[ext_resource path="res://assets/car_v.png" type="Texture" id=2]
+
+[sub_resource type="Shader" id=1]
+code = "shader_type canvas_item;
+
+uniform bool apply = true;
+uniform float amount = 1.0;
+uniform sampler2D offset_texture : hint_white;
+
+void fragment() {
+	vec4 texture_color = texture(TEXTURE, UV);
+	vec4 color = texture_color;
+	
+	if (apply == true) {
+		float adjusted_amount = amount * texture(offset_texture, UV).r / 100.0;
+		color.r = texture(TEXTURE, vec2(UV.x + adjusted_amount, UV.y)).r;
+		color.g = texture(TEXTURE, UV).g;
+		color.b = texture(TEXTURE, vec2(UV.x - adjusted_amount, UV.y)).b;
+	}
+	COLOR = color;
+}"
+
+[sub_resource type="ShaderMaterial" id=2]
+shader = SubResource( 1 )
+shader_param/apply = true
+shader_param/amount = 0.0
+
+[node name="Node2D" type="Node2D"]
+script = ExtResource( 1 )
+
+[node name="Sprite" type="Sprite" parent="."]
+material = SubResource( 2 )
+position = Vector2( 0, -107.141 )
+texture = ExtResource( 2 )
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2( 0, 138.041 )
+current = true
+smoothing_enabled = true
+smoothing_speed = 15.0
+
+[node name="car1" type="Position2D" parent="."]
+position = Vector2( -484.565, 3335.77 )
+
+[node name="car2" type="Position2D" parent="."]
+position = Vector2( 680, 3335.77 )
+
+[node name="Timer" type="Timer" parent="."]
+autostart = true
+
+[node name="Timer2" type="Timer" parent="."]
+wait_time = 0.5
+autostart = true
+
+[connection signal="timeout" from="Timer" to="." method="_on_Timer_timeout"]
+[connection signal="timeout" from="Timer2" to="." method="_on_Timer2_timeout"]
